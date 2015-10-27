@@ -1,0 +1,6 @@
+framework module WFTextView {
+  umbrella header "WFTextView.h"
+
+  export *
+  module * { export * }
+}
