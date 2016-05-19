@@ -24,4 +24,6 @@
 @property (nonatomic, assign) NSInteger maxLength;
 /** 重写系统代理 */
 @property (nonatomic, weak) id<WFTextViewDelegate> delegate;
+/** 是否自动改变自身高度 */
+@property (nonatomic, assign) BOOL autoChangeHeight;
 @end

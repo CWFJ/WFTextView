@@ -28,6 +28,18 @@
     _placeHolderLabel.text = placeHolderText;
 }
 
+#pragma mark ------<重写设置文本方法>
+/**
+ *  重写设置文本方法
+ *
+ *  @param text 文本
+ */
+- (void)setText:(NSString *)text {
+    [super setText:text];
+    NSNotification *notification = [NSNotification notificationWithName:UITextViewTextDidChangeNotification object:self];
+    [self textChanged:notification];
+}
+
 #pragma mark ------<监听通知>
 /**
  *  监听通知，显示/隐藏占位文字
@@ -39,6 +51,8 @@
     
     NSString *toBeString = self.text;
     NSString *lang = self.textInputMode.primaryLanguage; // 键盘输入模式
+    /** 记录当前光标位置 */
+    NSRange locationRange = [self selectedRange];
     if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入，包括简体拼音，健体五笔，简体手写
         UITextRange *selectedRange = [self markedTextRange];
         //获取高亮部分
@@ -79,6 +93,8 @@
             self.attributedText = [self.attributedText attributedSubstringFromRange:NSMakeRange(0, _maxLength)];
         }
     }
+    /** 恢复光标位置 */
+    self.selectedRange = locationRange;
     
     /** 占位符控制 */
     if(self.text.length > 0) {
@@ -91,9 +107,15 @@
     /** 更改自身高度适应文字 */
     CGFloat expectHeight = self.contentSize.height - 4;
     if(expectHeight <= 15 + self.font.pointSize * 5) {
-        self.height = expectHeight;
+        CGRect dstFrame = self.frame;
+        if(_autoChangeHeight) {
+            self.height = expectHeight;
+        }
+        else {
+            dstFrame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, expectHeight);
+        }
         if([self.delegate respondsToSelector:@selector(textView:shouldChangeFrame:)]) {
-            [self.delegate textView:self shouldChangeFrame:self.frame];
+            [self.delegate textView:self shouldChangeFrame:dstFrame];
         }
     }
     else {
